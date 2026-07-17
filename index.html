@@ -3,193 +3,230 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="theme-color" content="#0b1f3a" />
+<meta name="theme-color" content="#4c6ef5" />
 <title>Noten</title>
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="icon-192.png" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="Noten" />
 <style>
   :root{
-    --bg:#0b1220; --bg2:#0f1a2e; --card:#15223b; --card2:#1b2b48;
-    --line:#25375c; --text:#eaf0fb; --muted:#94a6c4; --accent:#4c8dff;
-    --good:#31c48d; --bad:#f26d6d; --warn:#f5b544;
-    --shadow:0 6px 20px rgba(0,0,0,.35);
-    --r:16px;
+    --bg:#f2f4f8; --surface:#ffffff; --surface2:#f7f9fc;
+    --text:#111827; --muted:#6b7280; --line:#e5e8ef;
+    --accent:#4c6ef5; --accent-ink:#ffffff;
+    --good:#0ca678; --good-bg:#e6f7f1;
+    --bad:#e8590c; --bad-bg:#fdecdf;
+    --shadow:0 1px 2px rgba(16,24,40,.04), 0 8px 24px rgba(16,24,40,.06);
+    --shadow-lg:0 12px 40px rgba(16,24,40,.14);
+    --r:20px; --r-sm:14px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0d1117; --surface:#161b25; --surface2:#1c222e;
+      --text:#eef2f9; --muted:#9aa4b6; --line:#262d3a;
+      --accent:#5b7cfa; --accent-ink:#ffffff;
+      --good:#2fd1a0; --good-bg:#12312a;
+      --bad:#ff924d; --bad-bg:#3a2415;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+      --shadow-lg:0 16px 44px rgba(0,0,0,.5);
+    }
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   html,body{margin:0; padding:0;}
   body{
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    background:linear-gradient(180deg,var(--bg),var(--bg2)); color:var(--text);
-    min-height:100vh; padding:env(safe-area-inset-top) 0 calc(90px + env(safe-area-inset-bottom));
+    background:var(--bg); color:var(--text);
+    min-height:100vh; padding:env(safe-area-inset-top) 0 calc(96px + env(safe-area-inset-bottom));
     -webkit-font-smoothing:antialiased;
   }
-  header{
-    position:sticky; top:0; z-index:20;
-    background:rgba(11,18,32,.85); backdrop-filter:blur(12px);
-    border-bottom:1px solid var(--line);
-    padding:calc(env(safe-area-inset-top) + 12px) 16px 12px;
-    display:flex; align-items:center; justify-content:space-between; gap:12px;
+  main{max-width:600px; margin:0 auto; padding:0 16px;}
+
+  /* App bar */
+  .appbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:calc(env(safe-area-inset-top) + 18px) 20px 10px; max-width:600px; margin:0 auto;
   }
-  header h1{font-size:19px; margin:0; font-weight:700; letter-spacing:.2px;}
+  .appbar h1{font-size:22px; margin:0; font-weight:800; letter-spacing:-.3px;}
   .iconbtn{
-    background:var(--card); border:1px solid var(--line); color:var(--text);
-    width:40px; height:40px; border-radius:12px; font-size:18px; display:grid; place-items:center;
-    cursor:pointer;
+    background:var(--surface); border:1px solid var(--line); color:var(--text);
+    width:42px; height:42px; border-radius:13px; font-size:19px; display:grid; place-items:center;
+    cursor:pointer; box-shadow:var(--shadow);
   }
-  main{max-width:640px; margin:0 auto; padding:16px;}
-  .summary{
-    display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:18px;
+
+  /* Hero: Gesamtschnitt */
+  .hero{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--r);
+    box-shadow:var(--shadow); padding:26px 22px 22px; text-align:center; margin:6px 0 14px;
+    position:relative; overflow:hidden;
   }
-  .stat{
-    background:var(--card); border:1px solid var(--line); border-radius:var(--r);
-    padding:14px 12px; text-align:center; box-shadow:var(--shadow);
+  .hero .cap{font-size:12px; letter-spacing:1.4px; text-transform:uppercase; color:var(--muted); font-weight:700;}
+  .hero .big{
+    font-size:64px; font-weight:850; line-height:1; margin:10px 0 4px; letter-spacing:-2px;
+    font-variant-numeric:tabular-nums;
   }
-  .stat .val{font-size:24px; font-weight:800; line-height:1.1;}
-  .stat .lbl{font-size:11px; color:var(--muted); margin-top:4px; text-transform:uppercase; letter-spacing:.6px;}
+  .hero .sub{font-size:13px; color:var(--muted); font-weight:600;}
+  .hero .badge{
+    display:inline-block; margin-top:2px; padding:4px 12px; border-radius:999px;
+    font-size:12.5px; font-weight:700;
+  }
+  .hero .badge.pass{background:var(--good-bg); color:var(--good);}
+  .hero .badge.fail{background:var(--bad-bg); color:var(--bad);}
+  .hero .badge.neutral{background:var(--surface2); color:var(--muted);}
+
+  /* Stat chips */
+  .chips{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px;}
+  .chip{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--r-sm);
+    padding:14px 16px; box-shadow:var(--shadow); display:flex; align-items:center; gap:12px;
+  }
+  .chip .ic{
+    width:38px; height:38px; border-radius:11px; display:grid; place-items:center; font-size:18px;
+    background:var(--surface2); flex:none;
+  }
+  .chip .val{font-size:20px; font-weight:800; line-height:1.05; font-variant-numeric:tabular-nums;}
+  .chip .lbl{font-size:11.5px; color:var(--muted); font-weight:600; margin-top:1px;}
+
+  /* Section title */
+  .sec-title{font-size:13px; font-weight:700; color:var(--muted); text-transform:uppercase;
+    letter-spacing:.8px; margin:2px 4px 10px;}
+
+  /* Semester cards */
   .sem{
-    background:var(--card); border:1px solid var(--line); border-radius:var(--r);
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--r);
     margin-bottom:14px; overflow:hidden; box-shadow:var(--shadow);
   }
-  .sem-head{
-    display:flex; align-items:center; gap:12px; padding:14px 16px; cursor:pointer; user-select:none;
-  }
-  .sem-head .caret{transition:transform .2s; color:var(--muted); font-size:13px;}
+  .sem-head{display:flex; align-items:center; gap:12px; padding:16px 18px; cursor:pointer; user-select:none;}
+  .sem-head .caret{transition:transform .2s; color:var(--muted); font-size:12px; flex:none;}
   .sem.collapsed .caret{transform:rotate(-90deg);}
   .sem-title{flex:1; min-width:0;}
-  .sem-title .name{font-weight:700; font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .sem-title .meta{font-size:12px; color:var(--muted); margin-top:2px;}
-  .sem-avg{font-weight:800; font-size:18px; text-align:right;}
-  .sem-avg small{display:block; font-size:10px; color:var(--muted); font-weight:600; letter-spacing:.5px;}
+  .sem-title .name{font-weight:700; font-size:16.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .sem-title .meta{font-size:12.5px; color:var(--muted); margin-top:3px; font-weight:500;}
+  .sem-avg{font-weight:850; font-size:22px; text-align:right; flex:none; font-variant-numeric:tabular-nums;}
+  .sem-avg small{display:block; font-size:9.5px; color:var(--muted); font-weight:700; letter-spacing:.6px; margin-top:1px;}
   .modules{border-top:1px solid var(--line);}
   .sem.collapsed .modules, .sem.collapsed .sem-actions{display:none;}
-  .mod{
-    display:flex; align-items:center; gap:12px; padding:12px 16px; border-bottom:1px solid rgba(37,55,92,.5);
-  }
+  .mod{display:flex; align-items:center; gap:12px; padding:13px 18px; border-bottom:1px solid var(--line);}
   .mod:last-child{border-bottom:none;}
   .mod .m-main{flex:1; min-width:0;}
-  .mod .m-name{font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .mod .m-sub{font-size:12px; color:var(--muted); margin-top:2px;}
+  .mod .m-name{font-size:15.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .mod .m-sub{font-size:12.5px; color:var(--muted); margin-top:2px;}
   .grade-pill{
-    min-width:52px; text-align:center; font-weight:800; font-size:16px;
-    padding:6px 10px; border-radius:10px; background:var(--card2); border:1px solid var(--line);
+    min-width:50px; text-align:center; font-weight:800; font-size:16px;
+    padding:7px 12px; border-radius:11px; background:var(--surface2); font-variant-numeric:tabular-nums;
   }
-  .grade-pill.pass{color:var(--good); border-color:rgba(49,196,141,.4);}
-  .grade-pill.fail{color:var(--bad); border-color:rgba(242,109,109,.4);}
+  .grade-pill.pass{color:var(--good); background:var(--good-bg);}
+  .grade-pill.fail{color:var(--bad); background:var(--bad-bg);}
   .grade-pill.none{color:var(--muted);}
-  .sem-actions{display:flex; gap:8px; padding:12px 16px; border-top:1px solid var(--line); background:rgba(0,0,0,.12);}
+  .sem-actions{display:flex; gap:8px; padding:12px 14px; border-top:1px solid var(--line); background:var(--surface2);}
+
   .btn{
-    background:var(--accent); color:#fff; border:none; padding:11px 14px; border-radius:12px;
-    font-size:14px; font-weight:600; cursor:pointer; flex:1; display:flex; align-items:center; justify-content:center; gap:6px;
+    background:var(--accent); color:var(--accent-ink); border:none; padding:12px 15px; border-radius:13px;
+    font-size:14.5px; font-weight:700; cursor:pointer; flex:1; display:flex; align-items:center; justify-content:center; gap:6px;
   }
   .btn.ghost{background:transparent; border:1px solid var(--line); color:var(--text);}
-  .btn.danger{background:transparent; border:1px solid rgba(242,109,109,.5); color:var(--bad); flex:none; width:44px;}
-  .btn.sm{padding:8px 10px; font-size:13px;}
-  .addSem{width:100%; margin-top:4px;}
-  .empty{
-    text-align:center; color:var(--muted); padding:50px 20px;
-  }
-  .empty .big{font-size:44px; margin-bottom:10px;}
+  .btn.danger{background:transparent; border:1px solid rgba(232,89,12,.4); color:var(--bad); flex:none; width:46px;}
+  .btn.sm{padding:9px 12px; font-size:13.5px;}
+  .addSem{width:100%; margin-top:2px;}
+
+  .empty{text-align:center; color:var(--muted); padding:44px 20px;}
+  .empty .big{font-size:46px; margin-bottom:12px;}
+  .empty div{line-height:1.6;}
+
   /* FAB */
   .fab{
-    position:fixed; right:18px; bottom:calc(18px + env(safe-area-inset-bottom)); z-index:30;
-    width:58px; height:58px; border-radius:50%; background:var(--accent); color:#fff;
-    border:none; font-size:30px; box-shadow:0 8px 24px rgba(76,141,255,.5); cursor:pointer;
-    display:grid; place-items:center;
+    position:fixed; right:20px; bottom:calc(22px + env(safe-area-inset-bottom)); z-index:30;
+    height:56px; padding:0 22px 0 18px; border-radius:28px; background:var(--accent); color:var(--accent-ink);
+    border:none; font-size:16px; font-weight:800; box-shadow:0 10px 28px rgba(76,110,245,.45); cursor:pointer;
+    display:flex; align-items:center; gap:8px;
   }
-  /* Modal / sheet */
-  .overlay{
-    position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:40; display:none;
-    align-items:flex-end; justify-content:center;
-  }
+  .fab .plus{font-size:24px; line-height:1; margin-top:-2px;}
+
+  /* Overlays / sheets */
+  .overlay{position:fixed; inset:0; background:rgba(15,20,32,.5); z-index:40; display:none; align-items:flex-end; justify-content:center; backdrop-filter:blur(2px);}
   .overlay.open{display:flex;}
   .sheet{
-    background:var(--bg2); width:100%; max-width:640px; border-radius:22px 22px 0 0;
-    border-top:1px solid var(--line); padding:20px 18px calc(24px + env(safe-area-inset-bottom));
-    animation:slideUp .25s ease;
+    background:var(--surface); width:100%; max-width:600px; border-radius:24px 24px 0 0;
+    padding:22px 20px calc(26px + env(safe-area-inset-bottom)); box-shadow:var(--shadow-lg);
+    animation:slideUp .26s cubic-bezier(.2,.8,.2,1); max-height:92vh; overflow-y:auto;
   }
-  @keyframes slideUp{from{transform:translateY(40px); opacity:.6;} to{transform:translateY(0); opacity:1;}}
-  .sheet h2{margin:0 0 16px; font-size:18px;}
-  label.field{display:block; margin-bottom:14px;}
-  label.field span{display:block; font-size:12px; color:var(--muted); margin-bottom:6px; text-transform:uppercase; letter-spacing:.5px;}
+  .sheet::before{content:""; display:block; width:40px; height:5px; border-radius:3px; background:var(--line); margin:-6px auto 16px;}
+  @keyframes slideUp{from{transform:translateY(40px); opacity:.5;} to{transform:translateY(0); opacity:1;}}
+  .sheet h2{margin:0 0 18px; font-size:19px; font-weight:800;}
+  label.field{display:block; margin-bottom:16px;}
+  label.field span{display:block; font-size:12px; color:var(--muted); margin-bottom:7px; font-weight:700; letter-spacing:.3px;}
   input,select{
-    width:100%; background:var(--card); border:1px solid var(--line); color:var(--text);
-    padding:13px 14px; border-radius:12px; font-size:16px; outline:none;
+    width:100%; background:var(--surface2); border:1px solid var(--line); color:var(--text);
+    padding:14px 15px; border-radius:13px; font-size:16px; outline:none; font-family:inherit;
   }
-  input:focus,select:focus{border-color:var(--accent);}
-  .grade-input-row{display:flex; gap:10px; align-items:stretch;}
-  .grade-input-row input{flex:1;}
-  .letters{display:flex; gap:6px; margin-top:10px; flex-wrap:wrap;}
-  .letters button{
-    flex:1; min-width:44px; background:var(--card); border:1px solid var(--line); color:var(--text);
-    padding:10px 0; border-radius:10px; font-weight:700; cursor:pointer;
-  }
-  .letters button.active{background:var(--accent); border-color:var(--accent); color:#fff;}
-  .sheet-actions{display:flex; gap:10px; margin-top:8px;}
-  .toggle-row{display:flex; align-items:center; justify-content:space-between; padding:14px 0; border-bottom:1px solid var(--line);}
+  input:focus,select:focus{border-color:var(--accent); background:var(--surface);}
+  .letters{display:flex; gap:7px; margin-top:11px; flex-wrap:wrap;}
+  .letters button{flex:1; min-width:44px; background:var(--surface2); border:1px solid var(--line); color:var(--text); padding:11px 0; border-radius:11px; font-weight:800; cursor:pointer; font-size:15px;}
+  .letters button.active{background:var(--accent); border-color:var(--accent); color:var(--accent-ink);}
+  .sheet-actions{display:flex; gap:10px; margin-top:10px;}
+  .toggle-row{display:flex; align-items:center; justify-content:space-between; padding:16px 0; border-bottom:1px solid var(--line);}
   .toggle-row:last-child{border-bottom:none;}
-  .toggle-row .t-lbl{font-size:15px;}
-  .toggle-row .t-sub{font-size:12px; color:var(--muted); margin-top:3px;}
-  .seg{display:flex; background:var(--card); border:1px solid var(--line); border-radius:10px; overflow:hidden;}
-  .seg button{background:transparent; border:none; color:var(--muted); padding:9px 14px; font-weight:700; cursor:pointer; font-size:14px;}
-  .seg button.active{background:var(--accent); color:#fff;}
-  .map-table{width:100%; font-size:13px; border-collapse:collapse; margin-top:6px;}
-  .map-table td{padding:6px 8px; border-bottom:1px solid var(--line); color:var(--muted);}
-  .map-table td:last-child{text-align:right; color:var(--text); font-weight:700;}
-  .note{font-size:12px; color:var(--muted); line-height:1.5; margin-top:6px;}
+  .toggle-row .t-lbl{font-size:15.5px; font-weight:600;}
+  .toggle-row .t-sub{font-size:12.5px; color:var(--muted); margin-top:3px; line-height:1.5;}
+  .seg{display:flex; background:var(--surface2); border:1px solid var(--line); border-radius:11px; overflow:hidden; flex:none;}
+  .seg button{background:transparent; border:none; color:var(--muted); padding:10px 16px; font-weight:800; cursor:pointer; font-size:14px;}
+  .seg button.active{background:var(--accent); color:var(--accent-ink);}
+  .map-table{width:100%; font-size:13px; border-collapse:collapse; margin-top:8px;}
+  .map-table td{padding:7px 8px; border-bottom:1px solid var(--line); color:var(--muted);}
+  .map-table tr:last-child td{border-bottom:none;}
+  .map-table td:last-child{text-align:right; color:var(--text); font-weight:800;}
+  .note{font-size:12px; color:var(--muted); line-height:1.55; margin-top:8px;}
   .hidden{display:none !important;}
   .toast{
-    position:fixed; left:50%; bottom:calc(96px + env(safe-area-inset-bottom)); transform:translateX(-50%);
-    background:var(--card2); border:1px solid var(--line); color:var(--text); padding:11px 16px;
-    border-radius:12px; font-size:14px; z-index:60; box-shadow:var(--shadow); opacity:0; pointer-events:none;
-    transition:opacity .25s, transform .25s;
+    position:fixed; left:50%; bottom:calc(100px + env(safe-area-inset-bottom)); transform:translateX(-50%);
+    background:var(--text); color:var(--surface); padding:12px 18px; border-radius:13px; font-size:14px; font-weight:600;
+    z-index:60; box-shadow:var(--shadow-lg); opacity:0; pointer-events:none; transition:opacity .25s, transform .25s;
   }
   .toast.show{opacity:1; transform:translateX(-50%) translateY(-6px);}
 </style>
 </head>
 <body>
-<header>
-  <h1>📚 Noten</h1>
+<div class="appbar">
+  <h1>Noten</h1>
   <button class="iconbtn" id="btnSettings" aria-label="Einstellungen">⚙︎</button>
-</header>
+</div>
 
 <main>
-  <div class="summary">
-    <div class="stat"><div class="val" id="statAvg">–</div><div class="lbl">Ø Gesamt</div></div>
-    <div class="stat"><div class="val" id="statEcts">0</div><div class="lbl">ECTS bestanden</div></div>
-    <div class="stat"><div class="val" id="statCount">0</div><div class="lbl">Noten</div></div>
+  <div class="hero">
+    <div class="cap">Gesamtschnitt</div>
+    <div class="big" id="statAvg">–</div>
+    <div class="badge neutral" id="statBadge">noch keine Noten</div>
   </div>
 
+  <div class="chips">
+    <div class="chip">
+      <div class="ic">🎓</div>
+      <div><div class="val" id="statEcts">0</div><div class="lbl">ECTS bestanden</div></div>
+    </div>
+    <div class="chip">
+      <div class="ic">📝</div>
+      <div><div class="val" id="statCount">0</div><div class="lbl">Noten erfasst</div></div>
+    </div>
+  </div>
+
+  <div class="sec-title">Semester</div>
   <div id="semesters"></div>
 
   <button class="btn ghost addSem" id="btnAddSem">＋ Semester hinzufügen</button>
 </main>
 
-<button class="fab" id="fabAdd" aria-label="Note hinzufügen">＋</button>
+<button class="fab" id="fabAdd" aria-label="Note hinzufügen"><span class="plus">＋</span> Note</button>
 
 <!-- Modal: Add/Edit grade -->
 <div class="overlay" id="ovGrade">
   <div class="sheet">
     <h2 id="gradeTitle">Note hinzufügen</h2>
-    <label class="field">
-      <span>Semester</span>
-      <select id="inSem"></select>
-    </label>
-    <label class="field">
-      <span>Fach / Modul</span>
-      <input id="inName" type="text" placeholder="z.B. Mathematik 1" autocomplete="off" />
-    </label>
-    <label class="field">
-      <span>ECTS-Credits</span>
-      <input id="inEcts" type="number" inputmode="decimal" step="0.5" min="0" placeholder="z.B. 3" />
-    </label>
+    <label class="field"><span>Semester</span><select id="inSem"></select></label>
+    <label class="field"><span>Fach / Modul</span><input id="inName" type="text" placeholder="z.B. Mathematik 1" autocomplete="off" /></label>
+    <label class="field"><span>ECTS-Credits</span><input id="inEcts" type="number" inputmode="decimal" step="0.5" min="0" placeholder="z.B. 3" /></label>
     <label class="field">
       <span id="gradeLabel">Note (1.0 – 6.0)</span>
-      <div class="grade-input-row">
-        <input id="inGrade" type="number" inputmode="decimal" step="0.05" min="1" max="6" placeholder="z.B. 5.25" />
-      </div>
+      <input id="inGrade" type="number" inputmode="decimal" step="0.05" min="1" max="6" placeholder="z.B. 5.25" />
       <div class="letters" id="letterRow"></div>
       <div class="note" id="gradeHint"></div>
     </label>
@@ -205,10 +242,7 @@
 <div class="overlay" id="ovSem">
   <div class="sheet">
     <h2 id="semTitle">Semester hinzufügen</h2>
-    <label class="field">
-      <span>Name</span>
-      <input id="inSemName" type="text" placeholder="z.B. HS 2024 / 1. Semester" autocomplete="off" />
-    </label>
+    <label class="field"><span>Name</span><input id="inSemName" type="text" placeholder="z.B. HS 2024 / 1. Semester" autocomplete="off" /></label>
     <div class="sheet-actions">
       <button class="btn ghost" id="btnCancelSem">Abbrechen</button>
       <button class="btn" id="btnSaveSem">Speichern</button>
@@ -221,14 +255,8 @@
   <div class="sheet">
     <h2>Einstellungen</h2>
     <div class="toggle-row">
-      <div>
-        <div class="t-lbl">Notenanzeige</div>
-        <div class="t-sub">Schweizer Note oder ECTS-Buchstabe</div>
-      </div>
-      <div class="seg" id="segDisplay">
-        <button data-mode="num">1–6</button>
-        <button data-mode="letter">A–F</button>
-      </div>
+      <div><div class="t-lbl">Notenanzeige</div><div class="t-sub">Schweizer Note oder ECTS-Buchstabe</div></div>
+      <div class="seg" id="segDisplay"><button data-mode="num">1–6</button><button data-mode="letter">A–F</button></div>
     </div>
     <div class="toggle-row" style="display:block;">
       <div class="t-lbl">Umrechnung 1–6 → A–F</div>
@@ -238,7 +266,7 @@
         <tr><td>5.25 – 5.74</td><td>B</td></tr>
         <tr><td>4.75 – 5.24</td><td>C</td></tr>
         <tr><td>4.25 – 4.74</td><td>D</td></tr>
-        <tr><td>4.00 – 4.24</td><td>E</td></tr>
+        <tr><td>4.00 – 4.24</td><td>E (bestanden)</td></tr>
         <tr><td>&lt; 4.00</td><td>F (nicht bestanden)</td></tr>
       </table>
     </div>
@@ -256,9 +284,7 @@
         <button class="btn danger" id="btnClear" style="width:auto; flex:1;">Alle Daten löschen</button>
       </div>
     </div>
-    <div class="sheet-actions">
-      <button class="btn" id="btnCloseSettings">Fertig</button>
-    </div>
+    <div class="sheet-actions"><button class="btn" id="btnCloseSettings">Fertig</button></div>
   </div>
 </div>
 
@@ -270,7 +296,6 @@
   const KEY = "hslu_noten_v1";
   const PASS = 4.0;
 
-  // ---- Grade <-> Letter mapping (transparent, fixed convention) ----
   function numToLetter(g){
     if(g==null||isNaN(g)) return "–";
     if(g>=5.75) return "A";
@@ -283,9 +308,8 @@
   const LETTER_TO_NUM = {A:6.0, B:5.5, C:5.0, D:4.5, E:4.0, F:3.0};
   const LETTERS = ["A","B","C","D","E","F"];
 
-  // ---- State ----
   let data = load();
-  let editing = null; // {semId, modId} or null
+  let editing = null;
 
   function load(){
     try{
@@ -305,7 +329,6 @@
   function save(){ localStorage.setItem(KEY, JSON.stringify(data)); }
   function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
 
-  // ---- Calculations (ECTS-weighted) ----
   function semStats(sem){
     let wSum=0, eSum=0, passed=0, count=0;
     sem.modules.forEach(m=>{
@@ -313,7 +336,7 @@
       if(!isNaN(g)){
         count++;
         if(!isNaN(e) && e>0){ wSum += g*e; eSum += e; }
-        else { wSum += g; eSum += 1; } // fallback weight 1 if no ects
+        else { wSum += g; eSum += 1; }
         if(g>=PASS && !isNaN(e)) passed += e;
       }
     });
@@ -345,7 +368,6 @@
     return (Math.round(g*100)/100).toFixed(2);
   }
 
-  // ---- Rendering ----
   const $ = id=>document.getElementById(id);
   const semWrap = $("semesters");
 
@@ -353,12 +375,16 @@
     const t = totalStats();
     $("statAvg").textContent = fmtAvg(t.avg);
     $("statAvg").style.color = t.avg==null ? "var(--text)" : (t.avg>=PASS?"var(--good)":"var(--bad)");
+    const badge = $("statBadge");
+    if(t.avg==null){ badge.className="badge neutral"; badge.textContent="noch keine Noten"; }
+    else if(t.avg>=PASS){ badge.className="badge pass"; badge.textContent="✓ bestanden"; }
+    else { badge.className="badge fail"; badge.textContent="unter 4.0"; }
     $("statEcts").textContent = round1(t.passedEcts);
     $("statCount").textContent = t.count;
 
     semWrap.innerHTML = "";
     if(data.semesters.length===0){
-      semWrap.innerHTML = '<div class="empty"><div class="big">🎓</div><div>Noch keine Semester.<br>Tippe unten auf ＋ oder „Semester hinzufügen".</div></div>';
+      semWrap.innerHTML = '<div class="empty"><div class="big">🎓</div><div>Noch keine Semester.<br>Tippe unten auf „＋ Note" oder „Semester hinzufügen".</div></div>';
       return;
     }
     data.semesters.forEach(sem=>{
@@ -418,7 +444,6 @@
   function round1(n){ n=parseFloat(n); if(isNaN(n)) return 0; return (Math.round(n*10)/10).toString().replace(/\.0$/,""); }
   function esc(s){ return String(s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 
-  // ---- Grade modal ----
   let selectedLetter=null;
   function buildLetterRow(){
     const row = $("letterRow");
@@ -486,7 +511,6 @@
 
     const sem = data.semesters.find(s=>s.id===semId);
     if(editing && editing.modId){
-      // if semester changed, move it
       const oldSem = data.semesters.find(s=>s.id===editing.semId);
       const m = oldSem.modules.find(x=>x.id===editing.modId);
       m.name=name; m.ects=ects; m.grade=grade;
@@ -509,7 +533,6 @@
     }
   });
 
-  // ---- Semester modal ----
   let editingSem=null;
   function openSem(semId){
     editingSem = semId||null;
@@ -534,13 +557,11 @@
   $("btnCancelSem").addEventListener("click", ()=>closeOverlay("ovSem"));
   $("btnAddSem").addEventListener("click", ()=>openSem(null));
 
-  // ---- FAB ----
   $("fabAdd").addEventListener("click", ()=>{
     if(data.semesters.length===0){ openSem(null); return; }
     openGrade(data.semesters[data.semesters.length-1].id, null);
   });
 
-  // ---- Settings ----
   function refreshSegDisplay(){
     $("segDisplay").querySelectorAll("button").forEach(b=>{
       b.classList.toggle("active", b.dataset.mode===data.settings.display);
@@ -554,7 +575,6 @@
   $("btnSettings").addEventListener("click", ()=>{ refreshSegDisplay(); openOverlay("ovSettings"); });
   $("btnCloseSettings").addEventListener("click", ()=>closeOverlay("ovSettings"));
 
-  // Export / Import / Clear
   $("btnExport").addEventListener("click", ()=>{
     const blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
     const url = URL.createObjectURL(blob);
@@ -586,14 +606,12 @@
     }
   });
 
-  // ---- Overlay helpers ----
   function openOverlay(id){ $(id).classList.add("open"); }
   function closeOverlay(id){ $(id).classList.remove("open"); }
   document.querySelectorAll(".overlay").forEach(ov=>{
     ov.addEventListener("click", e=>{ if(e.target===ov) ov.classList.remove("open"); });
   });
 
-  // ---- Toast ----
   let toastT=null;
   function toast(msg){
     const t=$("toast"); t.textContent=msg; t.classList.add("show");
@@ -603,11 +621,8 @@
   buildLetterRow();
   render();
 
-  // ---- Service worker ----
   if("serviceWorker" in navigator){
-    window.addEventListener("load", ()=>{
-      navigator.serviceWorker.register("sw.js").catch(()=>{});
-    });
+    window.addEventListener("load", ()=>{ navigator.serviceWorker.register("sw.js").catch(()=>{}); });
   }
 })();
 </script>
