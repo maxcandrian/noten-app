@@ -477,8 +477,20 @@
       </table>
     </div>
     <div class="toggle-row" style="display:block;">
+      <div class="t-lbl">Geräte-Sync</div>
+      <div class="t-sub" style="margin-bottom:12px;">Gib auf allen Geräten denselben Sync-Code ein – dann gleichen sich deine Noten automatisch ab (Internet nötig). Wer den Code kennt, sieht deine Noten, darum lang & geheim halten.</div>
+      <label class="field" style="margin-bottom:10px;">
+        <input id="inSyncCode" type="text" placeholder="z.B. katze-blau-7392" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" />
+      </label>
+      <div class="sheet-actions" style="margin-top:0;">
+        <button class="btn ghost sm" id="btnSyncGen">Code erzeugen</button>
+        <button class="btn sm" id="btnSyncSave">Sync aktivieren</button>
+      </div>
+      <div class="note" id="syncStatus"></div>
+    </div>
+    <div class="toggle-row" style="display:block;">
       <div class="t-lbl">Datensicherung</div>
-      <div class="t-sub" style="margin-bottom:12px;">Deine Noten liegen nur auf diesem Gerät. Exportiere regelmässig ein Backup.</div>
+      <div class="t-sub" style="margin-bottom:12px;">Zusätzliches Backup: deine Noten als Datei sichern (z.B. vor einem Handywechsel).</div>
       <div class="sheet-actions" style="margin-top:0;">
         <button class="btn ghost sm" id="btnExport">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></svg>
@@ -538,7 +550,7 @@
       s.modules.forEach(m=>{ m.id=m.id||uid(); }); });
     return d;
   }
-  function save(){ localStorage.setItem(KEY, JSON.stringify(data)); }
+  function save(){ localStorage.setItem(KEY, JSON.stringify(data)); markLocalChange(); scheduleSyncPush(); }
   function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
 
   function semStats(sem){
@@ -848,7 +860,7 @@
       data.settings.display=b.dataset.mode; save(); refreshSegDisplay(); render(); refreshGradeMode();
     });
   });
-  $("btnSettings").addEventListener("click", ()=>{ refreshSegDisplay(); openOverlay("ovSettings"); });
+  $("btnSettings").addEventListener("click", ()=>{ refreshSegDisplay(); updateSyncUI(); openOverlay("ovSettings"); });
   $("btnCloseSettings").addEventListener("click", ()=>closeOverlay("ovSettings"));
 
   $("btnExport").addEventListener("click", ()=>{
@@ -894,8 +906,146 @@
     clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"),1900);
   }
 
+  /* ── Geräte-Sync (Firebase Realtime DB via REST) ──────────────────
+     Speichert das gesamte Daten-Objekt unter /noten/<code> zusammen mit
+     einem Zeitstempel. Abgleich = "neuerer Zeitstempel gewinnt" (Last
+     Write Wins). Kein Login: Zugriff nur über den geheimen Sync-Code. */
+  const SYNC_BASE = "https://noten-app-a60cf-default-rtdb.europe-west1.firebasedatabase.app";
+  const CODE_KEY = "hslu_sync_code";
+  const T_KEY = "hslu_sync_t";
+  let syncCode = localStorage.getItem(CODE_KEY) || "";
+  let localT = parseInt(localStorage.getItem(T_KEY) || "0", 10) || 0;
+  let pushTimer = null, pollTimer = null;
+
+  function syncOn(){ return !!syncCode; }
+  function codeUrl(){ return SYNC_BASE + "/noten/" + encodeURIComponent(syncCode) + ".json"; }
+  function markLocalChange(){ localT = Date.now(); localStorage.setItem(T_KEY, String(localT)); }
+
+  // Editier-Dialoge offen? Dann keine Fremd-Daten drüberschreiben.
+  function editOpen(){
+    return $("ovGrade").classList.contains("open") || $("ovSem").classList.contains("open");
+  }
+
+  // Daten aus der Cloud übernehmen – OHNE erneuten Upload auszulösen.
+  function applyRemote(v, t){
+    data = normalize(v);
+    localStorage.setItem(KEY, JSON.stringify(data));
+    localT = t; localStorage.setItem(T_KEY, String(t));
+    render(); refreshSegDisplay(); refreshGradeMode();
+  }
+
+  function setSyncStatus(state){
+    const el = $("syncStatus"); if(!el) return;
+    if(!syncOn()){ el.textContent = "Sync ist aus. Code eingeben und „Sync aktivieren“ tippen."; return; }
+    const map = {
+      ok:"✓ Aktiv – Noten sind abgeglichen",
+      pulled:"✓ Neue Noten von anderem Gerät geladen",
+      syncing:"Wird abgeglichen …",
+      pushed:"✓ Aktiv – hochgeladen",
+      offline:"Kein Internet – gleicht ab, sobald online",
+      err:"Fehler – Firebase-Regeln/URL prüfen"
+    };
+    el.textContent = (map[state] || "✓ Aktiv") + " · Code: " + syncCode;
+  }
+
+  function updateSyncUI(){
+    if($("inSyncCode")) $("inSyncCode").value = syncCode;
+    setSyncStatus(syncOn() ? "ok" : "off");
+  }
+
+  function scheduleSyncPush(){
+    if(!syncOn()) return;
+    clearTimeout(pushTimer);
+    pushTimer = setTimeout(pushNow, 800);
+  }
+
+  function pushNow(){
+    if(!syncOn() || !navigator.onLine) return Promise.resolve();
+    setSyncStatus("syncing");
+    const t = localT;
+    return fetch(codeUrl(), {
+      method:"PUT",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ v:data, t:t })
+    }).then(res=>{ setSyncStatus(res.ok ? "pushed" : "err"); })
+      .catch(()=>{ setSyncStatus("offline"); });
+  }
+
+  function pullNow(){
+    if(!syncOn() || !navigator.onLine || editOpen()) return Promise.resolve();
+    return fetch(codeUrl() + "?_=" + Date.now(), {cache:"no-store"})
+      .then(res=>{ if(!res.ok){ setSyncStatus("err"); return null; } return res.json(); })
+      .then(remote=>{
+        if(remote === null) return; // Cloud noch leer – erst beim nächsten lokalen Speichern hochladen
+        if(typeof remote !== "object" || !remote.v) return;
+        const rt = remote.t || 0;
+        if(rt > localT){ applyRemote(remote.v, rt); setSyncStatus("pulled"); toast("Noten aktualisiert"); }
+        else if(localT > rt){ pushNow(); }
+        else setSyncStatus("ok");
+      })
+      .catch(()=>{ setSyncStatus("offline"); });
+  }
+
+  function startPolling(){
+    clearInterval(pollTimer);
+    if(!syncOn()) return;
+    pollTimer = setInterval(()=>{ if(document.visibilityState === "visible") pullNow(); }, 20000);
+  }
+
+  // Erst-Aktivierung: bewusst entscheiden, welche Seite gewinnt.
+  function activateSync(code){
+    syncCode = code;
+    localStorage.setItem(CODE_KEY, syncCode);
+    setSyncStatus("syncing");
+    const localHas = data.semesters.length > 0;
+    return fetch(codeUrl() + "?_=" + Date.now(), {cache:"no-store"})
+      .then(res=> res.ok ? res.json() : null)
+      .then(remote=>{
+        const remoteHas = remote && remote.v && Array.isArray(remote.v.semesters) && remote.v.semesters.length > 0;
+        if(remoteHas && localHas){
+          const useCloud = confirm(
+            "Auf diesem Gerät UND in der Cloud sind bereits Noten.\n\n" +
+            "OK  = Cloud-Daten übernehmen (Noten auf diesem Gerät werden ersetzt).\n" +
+            "Abbrechen = die Noten dieses Geräts in die Cloud schreiben (überschreibt die Cloud).");
+          if(useCloud) applyRemote(remote.v, remote.t || Date.now());
+          else { markLocalChange(); return pushNow(); }
+        } else if(remoteHas){
+          applyRemote(remote.v, remote.t || Date.now());
+          setSyncStatus("pulled");
+        } else {
+          markLocalChange(); return pushNow();
+        }
+      })
+      .then(()=>{ startPolling(); updateSyncUI(); })
+      .catch(()=>{ setSyncStatus("offline"); startPolling(); });
+  }
+
+  function genCode(){
+    const a = ["katze","hund","adler","tiger","fuchs","biber","wal","otter","luchs","rabe","falke","igel","dachs","reh","specht","molch"];
+    const c = ["blau","rot","gruen","gold","silber","grau","weiss","schwarz","tuerkis","violett","koralle","olive"];
+    const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+    return pick(a) + "-" + pick(c) + "-" + Math.floor(1000 + Math.random()*9000);
+  }
+
+  $("btnSyncGen").addEventListener("click", ()=>{ $("inSyncCode").value = genCode(); });
+  $("btnSyncSave").addEventListener("click", ()=>{
+    const c = $("inSyncCode").value.trim().toLowerCase().replace(/\s+/g,"-");
+    if(!c){
+      syncCode = ""; localStorage.removeItem(CODE_KEY); clearInterval(pollTimer);
+      updateSyncUI(); toast("Sync ausgeschaltet"); return;
+    }
+    if(c.length < 4){ toast("Code zu kurz – mind. 4 Zeichen"); return; }
+    activateSync(c).then(()=> toast("Sync aktiviert"));
+  });
+
+  document.addEventListener("visibilitychange", ()=>{ if(document.visibilityState === "visible") pullNow(); });
+  window.addEventListener("online", pullNow);
+  window.addEventListener("focus", pullNow);
+
   buildLetterRow();
   render();
+
+  if(syncOn()){ pullNow(); startPolling(); }
 
   if("serviceWorker" in navigator){
     window.addEventListener("load", ()=>{ navigator.serviceWorker.register("sw.js").catch(()=>{}); });

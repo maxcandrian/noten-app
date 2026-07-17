@@ -1,5 +1,5 @@
 /* Service Worker – offline cache for the Noten PWA */
-const CACHE = "noten-v3";
+const CACHE = "noten-v4";
 const ASSETS = [
   "./",
   "./index.html",
@@ -27,6 +27,8 @@ self.addEventListener("activate", (e) => {
 self.addEventListener("fetch", (e) => {
   const req = e.request;
   if (req.method !== "GET") return;
+  // Cloud-Sync (Firebase, andere Domain) NICHT cachen – immer live vom Netz holen.
+  if (new URL(req.url).origin !== self.location.origin) return;
   e.respondWith(
     caches.match(req).then((cached) => {
       if (cached) return cached;
