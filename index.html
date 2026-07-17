@@ -358,6 +358,44 @@
   @media (prefers-reduced-motion: reduce){
     *,*::before,*::after{animation-duration:.01ms !important; transition-duration:.01ms !important;}
   }
+
+  /* ── Ausrichtungen / Zertifikate ─────────────── */
+  .field-group{border:1px solid var(--line); border-radius:var(--r-sm); padding:16px; margin:2px 0 18px; background:var(--surface2);}
+  .fg-title{font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:1.1px; margin-bottom:14px;}
+  .field-group label.field:last-of-type{margin-bottom:0;}
+  .cbrow{display:flex; gap:10px; margin-bottom:18px; flex-wrap:wrap;}
+  .cbox{display:flex; align-items:center; gap:9px; flex:1; min-width:140px; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:12px 14px; font-size:14.5px; font-weight:500; cursor:pointer;}
+  .cbox input{width:20px; height:20px; min-height:0; accent-color:var(--accent); margin:0; flex:none;}
+
+  .profile-card{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow); padding:20px; margin-bottom:24px;}
+  .p-head{display:flex; align-items:center; gap:14px; margin-bottom:14px;}
+  .p-head > div:first-child{flex:1; min-width:0;}
+  .p-name{font-family:var(--serif); font-size:19px; font-weight:600; letter-spacing:-.2px;}
+  .p-short{font-size:12.5px; color:var(--muted); margin-top:4px; line-height:1.5;}
+  .p-ring{width:60px; height:60px; border-radius:50%; flex:none; display:grid; place-items:center; position:relative;
+    background:conic-gradient(var(--accent) calc(var(--p,0)*1%), var(--track) 0);}
+  .p-ring::before{content:""; position:absolute; inset:5px; border-radius:50%; background:var(--surface);}
+  .p-ring span{position:relative; font-size:14.5px; font-weight:600; font-family:var(--serif); font-variant-numeric:tabular-nums;}
+  .p-bar{height:6px; border-radius:3px; background:var(--track); overflow:hidden;}
+  .p-bar > i{display:block; height:100%; border-radius:3px; background:var(--accent); transition:width .6s var(--ease);}
+  .p-reqs{margin-top:18px; display:flex; flex-direction:column; gap:16px;}
+  .p-req{border-top:1px solid var(--line-soft); padding-top:16px;}
+  .p-req:first-child{border-top:none; padding-top:0;}
+  .p-req-top{display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:8px;}
+  .p-req-title{font-size:14.5px; font-weight:600; line-height:1.35;}
+  .p-req-pct{font-size:13px; font-weight:600; color:var(--muted); font-variant-numeric:tabular-nums; flex:none;}
+  .p-req-bar{height:4px; border-radius:2px; background:var(--track); overflow:hidden;}
+  .p-req-bar > i{display:block; height:100%; border-radius:2px; transition:width .6s var(--ease);}
+  .p-req-detail{font-size:12.5px; color:var(--muted); margin-top:8px; line-height:1.5;}
+  .p-mods{display:flex; flex-wrap:wrap; gap:6px; margin-top:10px;}
+  .p-mod{font-size:12px; background:var(--surface2); border:1px solid var(--line-soft); color:var(--text); padding:5px 10px; border-radius:999px; font-variant-numeric:tabular-nums;}
+  .p-check-list{margin-top:10px; display:flex; flex-direction:column; gap:8px;}
+  .p-cl{display:flex; align-items:center; gap:9px; font-size:13.5px; color:var(--muted);}
+  .p-cl.done{color:var(--text);}
+  .p-cl-ic{width:20px; height:20px; border-radius:50%; display:grid; place-items:center; font-size:12px; font-weight:700; background:var(--surface2); color:var(--muted); flex:none;}
+  .p-cl.done .p-cl-ic{background:var(--good-bg); color:var(--good);}
+  .p-cb{display:flex; align-items:center; gap:10px; font-size:14px; font-weight:500; cursor:pointer; padding:11px 13px; background:var(--surface2); border:1px solid var(--line-soft); border-radius:12px;}
+  .p-cb input{width:20px; height:20px; min-height:0; accent-color:var(--accent); margin:0; flex:none;}
 </style>
 </head>
 <body>
@@ -407,6 +445,8 @@
     </div>
   </div>
 
+  <div id="profileView"></div>
+
   <div class="sec-title">Semester</div>
   <div id="semesters"></div>
 
@@ -434,6 +474,26 @@
       <div class="letters" id="letterRow"></div>
       <div class="note" id="gradeHint"></div>
     </label>
+    <div class="field-group">
+      <div class="fg-title">Für Ausrichtungen (optional)</div>
+      <label class="field"><span>Modulcode</span><input id="inCode" type="text" placeholder="z.B. LINALG" autocomplete="off" autocapitalize="characters" spellcheck="false" /></label>
+      <label class="field sel"><span>Bereich</span>
+        <select id="inArea">
+          <option value="">– kein –</option>
+          <option value="core_related">Core / Related</option>
+          <option value="minor">Minor</option>
+          <option value="projekt">Projekt</option>
+          <option value="pflicht">Pflicht</option>
+          <option value="vertiefung">Vertiefung</option>
+          <option value="zusatz">Zusatz</option>
+        </select>
+      </label>
+      <div class="cbrow">
+        <label class="cbox"><input type="checkbox" id="inEnglish" /><span>auf Englisch</span></label>
+        <label class="cbox"><input type="checkbox" id="inAbroad" /><span>Auslandssemester</span></label>
+      </div>
+      <label class="field"><span>Zählt für Zertifikat</span><div class="letters" id="inTags"></div></label>
+    </div>
     <div class="sheet-actions">
       <button class="btn danger" id="btnDeleteGrade" title="Löschen" aria-label="Note löschen">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>
@@ -463,6 +523,20 @@
     <div class="toggle-row">
       <div><div class="t-lbl">Notenanzeige</div><div class="t-sub">Schweizer Note oder ECTS-Buchstabe</div></div>
       <div class="seg" id="segDisplay"><button data-mode="num">1–6</button><button data-mode="letter">A–F</button></div>
+    </div>
+    <div class="toggle-row" style="display:block;">
+      <div class="t-lbl">Ausrichtung (HSLU-Zertifikat)</div>
+      <div class="t-sub" style="margin-bottom:10px;">Wähle ein Zertifikat – die App zeigt dann deinen Fortschritt dazu an.</div>
+      <label class="field sel" style="margin-bottom:0;">
+        <select id="selProfile">
+          <option value="">Keine</option>
+          <option value="CCT">CCT – Clean Technologies</option>
+          <option value="CEP">CEP – Entrepreneurship</option>
+          <option value="CDP">CDP – Design</option>
+          <option value="CIP">CIP – International Profile</option>
+          <option value="CDS">CDS – Data Science</option>
+        </select>
+      </label>
     </div>
     <div class="toggle-row" style="display:block;">
       <div class="t-lbl">Umrechnung 1–6 → A–F</div>
@@ -540,14 +614,16 @@
       const raw = localStorage.getItem(KEY);
       if(raw){ const d = JSON.parse(raw); if(d && d.semesters) return normalize(d); }
     }catch(e){}
-    return { settings:{display:"num"}, semesters:[] };
+    return { settings:{display:"num", activeProfile:null}, profileState:{}, semesters:[] };
   }
   function normalize(d){
     d.settings = d.settings || {display:"num"};
     if(d.settings.display!=="letter") d.settings.display="num";
+    if(!("activeProfile" in d.settings)) d.settings.activeProfile = null;
+    d.profileState = (d.profileState && typeof d.profileState==="object") ? d.profileState : {};
     d.semesters = Array.isArray(d.semesters)?d.semesters:[];
     d.semesters.forEach(s=>{ s.id=s.id||uid(); s.modules=Array.isArray(s.modules)?s.modules:[];
-      s.modules.forEach(m=>{ m.id=m.id||uid(); }); });
+      s.modules.forEach(m=>{ m.id=m.id||uid(); if(m.tags!=null && !Array.isArray(m.tags)) m.tags=[]; }); });
     return d;
   }
   function save(){ localStorage.setItem(KEY, JSON.stringify(data)); markLocalChange(); scheduleSyncPush(); }
@@ -656,6 +732,7 @@
     else { badge.className="badge fail"; badge.textContent="unter 4.0"; }
     $("statEcts").textContent = round1(t.passedEcts);
     $("statCount").textContent = t.count;
+    renderProfile();
 
     semWrap.innerHTML = "";
     if(data.semesters.length===0){
@@ -772,10 +849,16 @@
       const m = sem.modules.find(x=>x.id===modId);
       $("gradeTitle").textContent="Note bearbeiten";
       $("inName").value=m.name||""; $("inEcts").value=m.ects??""; $("inGrade").value=m.grade??"";
+      $("inCode").value=m.code||""; $("inArea").value=m.area||"";
+      $("inEnglish").checked=m.english===true; $("inAbroad").checked=m.abroad===true;
+      setTags(Array.isArray(m.tags)?m.tags:[]);
       $("btnDeleteGrade").classList.remove("hidden");
     } else {
       $("gradeTitle").textContent="Note hinzufügen";
       $("inName").value=""; $("inEcts").value=""; $("inGrade").value="";
+      $("inCode").value=""; $("inArea").value="";
+      $("inEnglish").checked=false; $("inAbroad").checked=false;
+      setTags([]);
       $("btnDeleteGrade").classList.add("hidden");
     }
     syncLetterActive();
@@ -797,17 +880,24 @@
     let ects = ectsRaw===""? null : parseFloat(ectsRaw);
     if(ects!=null && (isNaN(ects)||ects<0)){ toast("ECTS ungültig"); return; }
 
+    const code = $("inCode").value.trim();
+    const area = $("inArea").value || null;
+    const english = $("inEnglish").checked;
+    const abroad = $("inAbroad").checked;
+    const tags = getTags();
+
     const sem = data.semesters.find(s=>s.id===semId);
     if(editing && editing.modId){
       const oldSem = data.semesters.find(s=>s.id===editing.semId);
       const m = oldSem.modules.find(x=>x.id===editing.modId);
       m.name=name; m.ects=ects; m.grade=grade;
+      m.code=code; m.area=area; m.english=english; m.abroad=abroad; m.tags=tags;
       if(editing.semId!==semId){
         oldSem.modules = oldSem.modules.filter(x=>x.id!==m.id);
         sem.modules.push(m);
       }
     } else {
-      sem.modules.push({id:uid(), name, ects, grade});
+      sem.modules.push({id:uid(), name, ects, grade, code, area, english, abroad, tags});
     }
     save(); render(); closeOverlay("ovGrade"); toast("Gespeichert");
   }
@@ -860,7 +950,7 @@
       data.settings.display=b.dataset.mode; save(); refreshSegDisplay(); render(); refreshGradeMode();
     });
   });
-  $("btnSettings").addEventListener("click", ()=>{ refreshSegDisplay(); updateSyncUI(); openOverlay("ovSettings"); });
+  $("btnSettings").addEventListener("click", ()=>{ refreshSegDisplay(); refreshProfileSelect(); updateSyncUI(); openOverlay("ovSettings"); });
   $("btnCloseSettings").addEventListener("click", ()=>closeOverlay("ovSettings"));
 
   $("btnExport").addEventListener("click", ()=>{
@@ -890,7 +980,7 @@
   });
   $("btnClear").addEventListener("click", ()=>{
     if(confirm("Wirklich ALLE Noten und Semester löschen? Das kann nicht rückgängig gemacht werden.")){
-      data={settings:{display:data.settings.display}, semesters:[]}; save(); render(); closeOverlay("ovSettings"); toast("Alle Daten gelöscht");
+      data={settings:{display:data.settings.display, activeProfile:data.settings.activeProfile}, profileState:data.profileState||{}, semesters:[]}; save(); render(); closeOverlay("ovSettings"); toast("Alle Daten gelöscht");
     }
   });
 
@@ -1042,7 +1132,176 @@
   window.addEventListener("online", pullNow);
   window.addEventListener("focus", pullNow);
 
+  /* ── Ausrichtungen / HSLU-Zertifikate ─────────────────────────────
+     Rein additiv: liest optionale Modul-Felder (code, english, abroad,
+     area, tags) und settings.activeProfile / profileState. Ändert NICHTS
+     am Notenschnitt, an Export/Import oder an bestehenden IDs. */
+  const CERTS = ["CCT","CEP","CDP","CIP","CDS"];
+  const PROFILES = [
+    {id:"CCT", name:"Clean Technologies", short:"Technik- & Nachhaltigkeits-Fokus. 12 ECTS CCT-Module + Projektmodul + Assessment."},
+    {id:"CEP", name:"Entrepreneurship",   short:"Eigenes Start-up. 12 ECTS CEP-Module + Projektmodul + Assessment/Antrag."},
+    {id:"CDP", name:"Design",             short:"Design-Fokus. 12 ECTS CDP-Module + BAT mit Design-Fokus + Assessment."},
+    {id:"CIP", name:"International Profile", short:"Englisch, Auslandssemester, Social Project & C1-Zertifikat."},
+    {id:"CDS", name:"Data Science",       short:"Pflichtmodule (Lineare Algebra, Python Advanced, Applied ML) + Antrag."}
+  ];
+
+  function allModules(){ const o=[]; data.semesters.forEach(s=> s.modules.forEach(m=> o.push(m))); return o; }
+  function modPassed(m){ const g=parseFloat(m.grade); return !isNaN(g) && g>=PASS; }
+  function modEcts(m){ const e=parseFloat(m.ects); return isNaN(e)?0:e; }
+  function modTags(m){ return Array.isArray(m.tags)?m.tags:[]; }
+  function profState(){ if(!data.profileState || typeof data.profileState!=="object") data.profileState={}; return data.profileState; }
+
+  // Anforderung mit ECTS-Ziel: erreichte / Ziel-ECTS (auf 0–100 % gekappt).
+  function ectsReq(title, mods, target){
+    let sum=0; mods.forEach(m=> sum+=modEcts(m));
+    const pct = target>0 ? Math.max(0, Math.min(1, sum/target)) : 0;
+    const missing = Math.max(0, target - sum);
+    return { title, pct,
+      mods: mods.map(m=>({name:m.name||"(ohne Namen)", ects:modEcts(m)})),
+      detail: missing>0 ? `Noch ${round1(missing)} von ${target} ECTS offen (aktuell ${round1(sum)})`
+                        : `Erfüllt · ${round1(sum)} ECTS erreicht` };
+  }
+  // Manuelle Anforderung: anteilig nach gesetzten Häkchen (in profileState).
+  function manualReq(profId, title, boxes){
+    const st = profState()[profId] || {};
+    let done=0; boxes.forEach(b=>{ if(st[b.key]) done++; });
+    const pct = boxes.length ? done/boxes.length : 0;
+    return { title, pct, profId,
+      checkboxes: boxes.map(b=>({key:b.key, label:b.label, checked:!!st[b.key]})),
+      detail: done===boxes.length ? "Manuell bestätigt · erledigt" : `Manuell bestätigen · ${done}/${boxes.length}` };
+  }
+  function matchesSpec(m, spec){
+    const code=(m.code||"").toLowerCase().trim();
+    const name=(m.name||"").toLowerCase();
+    if(spec.code && code && code===spec.code.toLowerCase()) return true;
+    return (spec.names||[]).some(n=> name.includes(n));
+  }
+  // Anforderung mit festen Pflichtmodulen (Match über Code ODER Modulname).
+  function modulesReq(title, specs){
+    const passed = allModules().filter(modPassed);
+    const items = specs.map(spec=> ({ label: spec.label, done: !!passed.find(m=> matchesSpec(m, spec)) }));
+    const done = items.filter(i=>i.done).length;
+    const pct = specs.length ? done/specs.length : 0;
+    return { title, pct, checklist:items,
+      detail: done===specs.length ? "Alle Pflichtmodule bestanden" : `${done}/${specs.length} Pflichtmodule bestanden` };
+  }
+
+  function computeProfile(id){
+    const passed = allModules().filter(modPassed);
+    const byTag = tag => passed.filter(m=> modTags(m).includes(tag));
+    const reqs=[];
+    if(id==="CCT"){
+      reqs.push(ectsReq("12 ECTS aus CCT-Modulen", byTag("CCT"), 12));
+      reqs.push(ectsReq("6 ECTS Projektmodul (BAT/PAIND, Technik & Nachhaltigkeit)", byTag("CCT").filter(m=>m.area==="projekt"), 6));
+      reqs.push(manualReq("CCT","Assessmentgespräch mit Studiengangsleitung",[{key:"assessment",label:"Assessmentgespräch geführt"}]));
+    } else if(id==="CEP"){
+      reqs.push(ectsReq("12 ECTS aus CEP-Modulen", byTag("CEP"), 12));
+      reqs.push(ectsReq("6 ECTS Projektmodul auf eigenem Start-up (PAIND/BAT)", byTag("CEP").filter(m=>m.area==="projekt"), 6));
+      reqs.push(manualReq("CEP","Assessment mit Smart-up + Antrag Studiengangleitung",[{key:"assessment",label:"Assessment mit Smart-up geführt"},{key:"antrag",label:"Antrag Studiengangleitung gestellt"}]));
+    } else if(id==="CDP"){
+      reqs.push(ectsReq("12 ECTS aus CDP-Modulen", byTag("CDP"), 12));
+      reqs.push(ectsReq("6 ECTS aus der BAT mit Design-Fokus", byTag("CDP").filter(m=>m.area==="projekt"), 6));
+      reqs.push(manualReq("CDP","Assessmentgespräch mit Designdozierenden",[{key:"assessment",label:"Assessmentgespräch geführt"}]));
+    } else if(id==="CIP"){
+      const eng = passed.filter(m=> m.english===true);
+      reqs.push(ectsReq("12 ECTS auf Englisch aus Core/Related", eng.filter(m=>m.area==="core_related"), 12));
+      reqs.push(ectsReq("6 ECTS auf Englisch aus Minor/Projekt", eng.filter(m=> m.area==="minor"||m.area==="projekt"), 6));
+      reqs.push(ectsReq("12 ECTS im Auslandssemester", passed.filter(m=>m.abroad===true), 12));
+      reqs.push(manualReq("CIP","3 ECTS Social Project als „Buddy“",[{key:"buddy",label:"Social Project als Buddy absolviert"}]));
+      reqs.push(manualReq("CIP","Englischzertifikat C1 vor Abschluss",[{key:"c1",label:"C1-Zertifikat vorhanden"}]));
+    } else if(id==="CDS"){
+      reqs.push(modulesReq("Pflichtmodule bestanden", [
+        {label:"Lineare Algebra", code:"LINALG", names:["lineare algebra","linalg"]},
+        {label:"Python Advanced", code:"PYTHON_AD", names:["python advanced"]},
+        {label:"Applied Machine Learning & Predictive Modeling", code:"STAT", names:["applied machine learning","predictive modeling"]}
+      ]));
+      reqs.push(manualReq("CDS","Antrag bis spätestens Start des letzten Studiensemesters",[{key:"antrag",label:"Antrag gestellt"}]));
+    }
+    const overall = reqs.length ? reqs.reduce((a,r)=>a+r.pct,0)/reqs.length : 0;
+    return { reqs, overall };
+  }
+
+  // Zusatzhinweise je Zertifikat (nicht fortschrittsrelevant).
+  const PROFILE_NOTE = {
+    CIP: "Antrag bei der Studiengangleitung stellen. Zum Antragszeitpunkt muss Englisch mind. B1 sein (C1 erst bis zum Abschluss)."
+  };
+
+  function reqHtml(r){
+    const pct = Math.round(r.pct*100);
+    let inner="";
+    if(r.mods && r.mods.length){
+      inner += '<div class="p-mods">' + r.mods.map(m=>`<span class="p-mod">${esc(m.name)} · ${round1(m.ects)} ECTS</span>`).join("") + '</div>';
+    }
+    if(r.checklist){
+      inner += '<div class="p-check-list">' + r.checklist.map(c=>`<div class="p-cl ${c.done?"done":""}"><span class="p-cl-ic">${c.done?"✓":"○"}</span>${esc(c.label)}</div>`).join("") + '</div>';
+    }
+    if(r.checkboxes){
+      inner += '<div class="p-check-list">' + r.checkboxes.map(c=>`<label class="p-cb"><input type="checkbox" data-prof="${r.profId}" data-box="${c.key}" ${c.checked?"checked":""}/><span>${esc(c.label)}</span></label>`).join("") + '</div>';
+    }
+    const barColor = r.pct>=1 ? "var(--good)" : "var(--accent)";
+    return `<div class="p-req">
+      <div class="p-req-top"><div class="p-req-title">${esc(r.title)}</div><div class="p-req-pct">${pct}%</div></div>
+      <div class="p-req-bar"><i style="width:${pct}%; background:${barColor}"></i></div>
+      <div class="p-req-detail">${esc(r.detail)}</div>
+      ${inner}
+    </div>`;
+  }
+
+  function renderProfile(){
+    const host = $("profileView");
+    if(!host) return;
+    const id = data.settings.activeProfile;
+    const prof = id ? PROFILES.find(p=>p.id===id) : null;
+    if(!prof){ host.innerHTML=""; return; }
+    const res = computeProfile(id);
+    const pctTxt = Math.round(res.overall*100);
+    const noteHtml = PROFILE_NOTE[id] ? `<div class="note" style="margin-top:14px;">${esc(PROFILE_NOTE[id])}</div>` : "";
+    host.innerHTML =
+      '<div class="sec-title">Ausrichtung</div>'
+      + '<div class="profile-card">'
+      +   '<div class="p-head">'
+      +     `<div><div class="p-name">${esc(prof.name)} <span style="color:var(--muted); font-weight:600;">· ${esc(prof.id)}</span></div><div class="p-short">${esc(prof.short)}</div></div>`
+      +     `<div class="p-ring" style="--p:${pctTxt}"><span>${pctTxt}%</span></div>`
+      +   '</div>'
+      +   `<div class="p-bar"><i style="width:${pctTxt}%"></i></div>`
+      +   `<div class="p-reqs">${res.reqs.map(reqHtml).join("")}</div>`
+      +   noteHtml
+      + '</div>';
+    host.querySelectorAll('input[type=checkbox][data-prof]').forEach(cb=>{
+      cb.addEventListener("change", ()=>{
+        const ps = profState();
+        if(!ps[cb.dataset.prof]) ps[cb.dataset.prof]={};
+        ps[cb.dataset.prof][cb.dataset.box] = cb.checked;
+        save(); renderProfile();
+      });
+    });
+  }
+
+  function refreshProfileSelect(){ if($("selProfile")) $("selProfile").value = data.settings.activeProfile || ""; }
+  if($("selProfile")){
+    $("selProfile").addEventListener("change", ()=>{
+      data.settings.activeProfile = $("selProfile").value || null;
+      save(); renderProfile();
+    });
+  }
+
+  /* Modul-Feld "Zählt für Zertifikat": Mehrfachauswahl (Toggle-Buttons) */
+  let selectedTags = new Set();
+  function buildTagRow(){
+    const row=$("inTags"); if(!row) return; row.innerHTML="";
+    CERTS.forEach(c=>{
+      const b=document.createElement("button");
+      b.type="button"; b.textContent=c; b.dataset.tag=c;
+      b.addEventListener("click", ()=>{ if(selectedTags.has(c)) selectedTags.delete(c); else selectedTags.add(c); syncTagActive(); });
+      row.appendChild(b);
+    });
+  }
+  function syncTagActive(){ $("inTags").querySelectorAll("button").forEach(b=> b.classList.toggle("active", selectedTags.has(b.dataset.tag))); }
+  function setTags(arr){ selectedTags = new Set(Array.isArray(arr)?arr:[]); syncTagActive(); }
+  function getTags(){ return Array.from(selectedTags); }
+
   buildLetterRow();
+  buildTagRow();
   render();
 
   if(syncOn()){ pullNow(); startPolling(); }
