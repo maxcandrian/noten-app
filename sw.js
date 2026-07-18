@@ -1,5 +1,5 @@
 /* Service Worker – offline cache for the Noten PWA */
-const CACHE = "noten-v6";
+const CACHE = "noten-v7";
 const ASSETS = [
   "./",
   "./index.html",

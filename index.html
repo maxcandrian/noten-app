@@ -446,17 +446,46 @@
   .toast button{background:none; border:none; color:var(--accent); font-weight:700; cursor:pointer; font-size:14px; padding:2px 4px; min-height:0; white-space:nowrap;}
   .grade-pill{cursor:pointer;}
   .sheet.note-only .hide-in-note{display:none !important;}
+
+  /* ── Statistik ─────────────────────────────── */
+  .appbar-actions{display:flex; gap:8px; align-items:center;}
+  .stat-card{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow); padding:20px; margin-bottom:16px;}
+  .stat-card h3{font-family:var(--serif); font-size:17px; font-weight:600; margin:0 0 4px; letter-spacing:-.2px;}
+  .stat-card .sub{font-size:12.5px; color:var(--muted); margin-bottom:14px; line-height:1.5;}
+  .chart{width:100%; height:auto; display:block; overflow:visible;}
+  .cx-lbl{font-size:9px; fill:var(--muted); font-family:var(--sans); font-variant-numeric:tabular-nums;}
+  .stat-hero{display:flex; align-items:center; gap:18px;}
+  .stat-ring{position:relative; width:96px; height:96px; flex:none;}
+  .stat-ring-svg{width:96px; height:96px; display:block;}
+  .stat-ring-num{position:absolute; inset:0; display:grid; place-items:center; font-family:var(--serif); font-size:21px; font-weight:600; font-variant-numeric:tabular-nums;}
+  .stat-big{font-family:var(--serif); font-size:30px; font-weight:600; line-height:1; letter-spacing:-.5px; font-variant-numeric:tabular-nums;}
+  .stat-big span{font-size:16px; color:var(--muted); font-family:var(--sans);}
+  .cat-row{border-top:1px solid var(--line-soft); padding-top:14px; margin-top:14px;}
+  .cat-row:first-child{border-top:none; padding-top:0; margin-top:0;}
+  .mini-toggle{background:var(--surface2); border:1px solid var(--line-soft); color:var(--muted); font-size:11px; font-weight:600; border-radius:8px; padding:3px 8px; margin-left:8px; cursor:pointer; min-height:0; vertical-align:middle;}
+  .kern-sub{margin-top:12px; padding-left:12px; border-left:2px solid var(--line); display:flex; flex-direction:column; gap:12px;}
+  .empty-chart{padding:22px; text-align:center; color:var(--muted); font-size:13px;}
+  .tgt-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .tgt-grid label{display:flex; flex-direction:column; gap:5px; font-size:11px; color:var(--muted); font-weight:600; letter-spacing:.3px;}
+  .tgt-grid input{min-height:44px; padding:10px 12px; font-size:15px; font-variant-numeric:tabular-nums;}
 </style>
 </head>
 <body>
 <div class="appbar">
   <h1>Noten</h1>
-  <button class="iconbtn" id="btnSettings" aria-label="Einstellungen">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" width="20" height="20" aria-hidden="true">
-      <circle cx="12" cy="12" r="3"/>
-      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-    </svg>
-  </button>
+  <div class="appbar-actions">
+    <button class="iconbtn" id="btnStats" aria-label="Statistik">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" width="20" height="20" aria-hidden="true">
+        <path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="5"/><rect x="12.5" y="8" width="3" height="9"/><rect x="18" y="4.5" width="3" height="12.5"/>
+      </svg>
+    </button>
+    <button class="iconbtn" id="btnSettings" aria-label="Einstellungen">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" width="20" height="20" aria-hidden="true">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </button>
+  </div>
 </div>
 
 <main>
@@ -627,6 +656,19 @@
       </table>
     </div>
     <div class="toggle-row" style="display:block;">
+      <div class="t-lbl">Studienziele (ECTS)</div>
+      <div class="t-sub" style="margin-bottom:12px;">Mindestwerte laut Studienplan (nicht amtlich). Minima summieren auf 168 → ~12 ECTS frei bis 180. Anpassbar.</div>
+      <div class="tgt-grid">
+        <label>Gesamt<input type="number" id="tgtTotal" inputmode="numeric" min="0" step="1" /></label>
+        <label>Kernmodule<input type="number" id="tgtKern" inputmode="numeric" min="0" step="1" /></label>
+        <label>· Engineering<input type="number" id="tgtEng" inputmode="numeric" min="0" step="1" /></label>
+        <label>· Wirtschaft<input type="number" id="tgtWirt" inputmode="numeric" min="0" step="1" /></label>
+        <label>· Design<input type="number" id="tgtDesign" inputmode="numeric" min="0" step="1" /></label>
+        <label>Projektmodule<input type="number" id="tgtProjekt" inputmode="numeric" min="0" step="1" /></label>
+        <label>Wahlbereich<input type="number" id="tgtWahl" inputmode="numeric" min="0" step="1" /></label>
+      </div>
+    </div>
+    <div class="toggle-row" style="display:block;">
       <div class="t-lbl">Geräte-Sync</div>
       <div class="t-sub" style="margin-bottom:12px;">Gib auf allen Geräten denselben Sync-Code ein – dann gleichen sich deine Noten automatisch ab (Internet nötig). Wer den Code kennt, sieht deine Noten, darum lang & geheim halten.</div>
       <label class="field" style="margin-bottom:10px;">
@@ -662,6 +704,15 @@
   </div>
 </div>
 
+<!-- Modal: Statistik -->
+<div class="overlay" id="ovStats">
+  <div class="sheet">
+    <h2>Statistik</h2>
+    <div id="statsView"></div>
+    <div class="sheet-actions"><button class="btn" id="btnCloseStats">Fertig</button></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"><span id="toastMsg"></span><button type="button" id="toastAction" class="hidden"></button></div>
 
 <script>
@@ -669,6 +720,8 @@
   "use strict";
   const KEY = "hslu_noten_v1";
   const PASS = 4.0;
+  // Offizielle Mindestwerte WI|Innovation (nicht amtlich, editierbar via settings.targets).
+  const DEFAULT_TARGETS = { total:180, kern:93, eng:54, wirt:30, design:9, projekt:45, wahl:30 };
 
   function numToLetter(g){
     if(g==null||isNaN(g)) return "–";
@@ -699,12 +752,13 @@
       const raw = localStorage.getItem(KEY);
       if(raw){ const d = JSON.parse(raw); if(d && d.semesters) return normalize(d); }
     }catch(e){}
-    return { settings:{display:"num", activeProfile:null}, profileState:{}, semesters:[] };
+    return normalize({ settings:{display:"num"}, semesters:[] });
   }
   function normalize(d){
     d.settings = d.settings || {display:"num"};
     if(d.settings.display!=="letter") d.settings.display="num";
     if(!("activeProfile" in d.settings)) d.settings.activeProfile = null;
+    d.settings.targets = Object.assign({}, DEFAULT_TARGETS, (d.settings.targets && typeof d.settings.targets==="object") ? d.settings.targets : {});
     d.profileState = (d.profileState && typeof d.profileState==="object") ? d.profileState : {};
     d.semesters = Array.isArray(d.semesters)?d.semesters:[];
     d.semesters.forEach(s=>{ s.id=s.id||uid(); s.modules=Array.isArray(s.modules)?s.modules:[];
@@ -818,6 +872,7 @@
     $("statEcts").textContent = round1(t.passedEcts);
     $("statCount").textContent = t.count;
     renderProfile();
+    renderStatsIfOpen();
 
     semWrap.innerHTML = "";
     if(data.semesters.length===0){
@@ -1210,7 +1265,7 @@
       data.settings.display=b.dataset.mode; save(); refreshSegDisplay(); render(); refreshGradeMode();
     });
   });
-  $("btnSettings").addEventListener("click", ()=>{ refreshSegDisplay(); refreshProfileSelect(); updateSyncUI(); openOverlay("ovSettings"); });
+  $("btnSettings").addEventListener("click", ()=>{ refreshSegDisplay(); refreshProfileSelect(); refreshTargets(); updateSyncUI(); openOverlay("ovSettings"); });
   $("btnCloseSettings").addEventListener("click", ()=>closeOverlay("ovSettings"));
 
   $("btnExport").addEventListener("click", ()=>{
@@ -1240,7 +1295,7 @@
   });
   $("btnClear").addEventListener("click", ()=>{
     if(confirm("Wirklich ALLE Noten und Semester löschen? Das kann nicht rückgängig gemacht werden.")){
-      data={settings:{display:data.settings.display, activeProfile:data.settings.activeProfile}, profileState:data.profileState||{}, semesters:[]}; save(); render(); closeOverlay("ovSettings"); toast("Alle Daten gelöscht");
+      data={settings:{display:data.settings.display, activeProfile:data.settings.activeProfile, targets:data.settings.targets}, profileState:data.profileState||{}, semesters:[]}; save(); render(); closeOverlay("ovSettings"); toast("Alle Daten gelöscht");
     }
   });
 
@@ -1571,6 +1626,155 @@
   function syncTagActive(){ $("inTags").querySelectorAll("button").forEach(b=> b.classList.toggle("active", selectedTags.has(b.dataset.tag))); }
   function setTags(arr){ selectedTags = new Set(Array.isArray(arr)?arr:[]); syncTagActive(); }
   function getTags(){ return Array.from(selectedTags); }
+
+  /* ── Statistik-Ansicht (alle Diagramme reines inline-SVG, offline) ──
+     Rein additiv/lesend: nutzt bestehende Berechnungen (semStats, PASS)
+     und settings.targets. Ändert nichts am Datenmodell oder Notenschnitt. */
+  function catOf(m){
+    const k=(m.kategorie||"").toLowerCase();
+    if(k==="pflicht"||k==="kernwahl") return "kern";
+    if(k==="projekt") return "projekt";
+    if(k==="erweiterung") return "wahl";
+    return "sonstige";
+  }
+  function computeStats(){
+    const t = data.settings.targets || DEFAULT_TARGETS;
+    let passedTotal=0;
+    const cat={kern:0, projekt:0, wahl:0, sonstige:0};
+    const ber={engineering:0, wirtschaft:0, design:0};
+    const perSem = data.semesters.map(s=>{
+      let semPassed=0;
+      s.modules.forEach(m=>{
+        const g=parseFloat(m.grade), e=parseFloat(m.ects);
+        if(!isNaN(g) && g>=PASS && !isNaN(e) && e>0){
+          semPassed+=e; passedTotal+=e;
+          const c=catOf(m); cat[c]+=e;
+          if(c==="kern"){ const b=(m.bereich||"").toLowerCase(); if(ber[b]!=null) ber[b]+=e; }
+        }
+      });
+      return { name:s.name, passed:semPassed, avg:semStats(s).avg };
+    });
+    return { t, passedTotal, cat, ber, perSem };
+  }
+
+  function svgRing(pct){
+    const r=52, c=2*Math.PI*r, off=c*(1-Math.max(0,Math.min(1,pct)));
+    return `<svg viewBox="0 0 120 120" class="stat-ring-svg" aria-hidden="true"><circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--track)" stroke-width="10"/><circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--accent)" stroke-width="10" stroke-linecap="round" stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" transform="rotate(-90 60 60)"/></svg>`;
+  }
+  function svgCumulative(perSem, total){
+    if(!perSem.length) return '<div class="empty-chart">Noch keine Semester erfasst.</div>';
+    const W=320,H=190,padL=32,padR=14,padT=16,padB=40;
+    const innerW=W-padL-padR, innerH=H-padT-padB;
+    const n=perSem.length, slot=innerW/n;
+    let cum=0; const pts=perSem.map((s,i)=>{ cum+=s.passed; return {x:padL+slot*(i+0.5), cum, passed:s.passed}; });
+    const top=Math.max(total, cum)*1.05 || 1;
+    const y=v=> padT+innerH*(1-v/top);
+    const baseY=padT+innerH;
+    const bw=Math.min(24, slot*0.5);
+    const bars=pts.map(p=>{ const h=innerH*(p.passed/top); return `<rect x="${(p.x-bw/2).toFixed(1)}" y="${(baseY-h).toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="3" fill="var(--accent-soft)"/>`; }).join("");
+    const yT=y(total);
+    const target=`<line x1="${padL}" y1="${yT.toFixed(1)}" x2="${W-padR}" y2="${yT.toFixed(1)}" stroke="var(--good)" stroke-width="1.3" stroke-dasharray="4 4"/><text x="${(W-padR).toFixed(1)}" y="${(yT-5).toFixed(1)}" text-anchor="end" class="cx-lbl" fill="var(--good)">Ziel ${total}</text>`;
+    const line=`<polyline fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="${pts.map(p=>p.x.toFixed(1)+","+y(p.cum).toFixed(1)).join(" ")}"/>`;
+    const dots=pts.map(p=>`<circle cx="${p.x.toFixed(1)}" cy="${y(p.cum).toFixed(1)}" r="3.2" fill="var(--accent)"/>`).join("");
+    const last=pts[pts.length-1];
+    const lastLbl=`<text x="${last.x.toFixed(1)}" y="${(y(last.cum)-8).toFixed(1)}" text-anchor="middle" class="cx-lbl" fill="var(--accent)">${round1(last.cum)}</text>`;
+    const axis=`<line x1="${padL}" y1="${baseY.toFixed(1)}" x2="${W-padR}" y2="${baseY.toFixed(1)}" stroke="var(--line)" stroke-width="1"/>`;
+    const yaxis=`<text x="${(padL-6).toFixed(1)}" y="${(padT+4).toFixed(1)}" text-anchor="end" class="cx-lbl">${Math.round(top)}</text><text x="${(padL-6).toFixed(1)}" y="${baseY.toFixed(1)}" text-anchor="end" class="cx-lbl">0</text>`;
+    const xlabels=pts.map((p,i)=>`<text x="${p.x.toFixed(1)}" y="${H-14}" text-anchor="middle" class="cx-lbl">S${i+1}</text>`).join("");
+    return `<svg viewBox="0 0 ${W} ${H}" class="chart" role="img" aria-label="Kredit-Verlauf">${bars}${axis}${target}${line}${dots}${lastLbl}${yaxis}${xlabels}</svg>`;
+  }
+  function svgAverages(perSem){
+    const withAvg=perSem.filter(s=>s.avg!=null);
+    if(!withAvg.length) return '<div class="empty-chart">Noch keine benoteten Semester.</div>';
+    const W=320,H=180,padL=26,padR=12,padT=16,padB=38;
+    const innerW=W-padL-padR, innerH=H-padT-padB;
+    const n=perSem.length, slot=innerW/n;
+    const yMin=1,yMax=6;
+    const y=v=> padT+innerH*(1-(Math.max(yMin,Math.min(yMax,v))-yMin)/(yMax-yMin));
+    const baseY=padT+innerH;
+    let best=withAvg[0].avg, worst=withAvg[0].avg;
+    withAvg.forEach(s=>{ if(s.avg>best)best=s.avg; if(s.avg<worst)worst=s.avg; });
+    const bw=Math.min(30, slot*0.55);
+    let bars="", labels="";
+    perSem.forEach((s,i)=>{
+      const xc=padL+slot*(i+0.5);
+      labels+=`<text x="${xc.toFixed(1)}" y="${H-14}" text-anchor="middle" class="cx-lbl">S${i+1}</text>`;
+      if(s.avg==null) return;
+      const yy=y(s.avg), h=baseY-yy;
+      let col="var(--accent)";
+      if(withAvg.length>1 && s.avg===best) col="var(--good)";
+      else if(withAvg.length>1 && s.avg===worst) col="var(--bad)";
+      bars+=`<rect x="${(xc-bw/2).toFixed(1)}" y="${yy.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="4" fill="${col}"/>`;
+      bars+=`<text x="${xc.toFixed(1)}" y="${(yy-5).toFixed(1)}" text-anchor="middle" class="cx-lbl">${fmtAvg(s.avg)}</text>`;
+    });
+    const passY=y(4.0);
+    const passLine=`<line x1="${padL}" y1="${passY.toFixed(1)}" x2="${W-padR}" y2="${passY.toFixed(1)}" stroke="var(--muted)" stroke-width="1" stroke-dasharray="3 3" opacity=".55"/><text x="${padL}" y="${(passY-4).toFixed(1)}" class="cx-lbl">4.0</text>`;
+    const axis=`<line x1="${padL}" y1="${baseY.toFixed(1)}" x2="${W-padR}" y2="${baseY.toFixed(1)}" stroke="var(--line)" stroke-width="1"/>`;
+    return `<svg viewBox="0 0 ${W} ${H}" class="chart" role="img" aria-label="Notenschnitt je Semester">${passLine}${axis}${bars}${labels}</svg>`;
+  }
+
+  function catRowHtml(title, got, target){
+    const pct = target>0? Math.min(1, got/target):0, p=Math.round(pct*100), remain=Math.max(0,target-got);
+    return `<div class="p-req-top"><div class="p-req-title">${esc(title)}</div><div class="p-req-pct">${round1(got)} / ${target}</div></div>`
+      + `<div class="p-req-bar"><i style="width:${p}%; background:${pct>=1?'var(--good)':'var(--accent)'}"></i></div>`
+      + `<div class="p-req-detail">${p}%${remain>0?(" · noch "+round1(remain)+" ECTS"):" · erreicht"}</div>`;
+  }
+  function catBlock(st){
+    const t=st.t;
+    let h = '<div class="cat-row">'
+      + `<div class="p-req-top"><div class="p-req-title">Kernmodule <button type="button" id="kernToggle" class="mini-toggle" aria-expanded="false">Bereiche</button></div><div class="p-req-pct">${round1(st.cat.kern)} / ${t.kern}</div></div>`
+      + `<div class="p-req-bar"><i style="width:${Math.round(Math.min(1,t.kern>0?st.cat.kern/t.kern:0)*100)}%; background:${st.cat.kern>=t.kern?'var(--good)':'var(--accent)'}"></i></div>`
+      + `<div class="p-req-detail">${Math.round((t.kern>0?Math.min(1,st.cat.kern/t.kern):0)*100)}%${Math.max(0,t.kern-st.cat.kern)>0?(" · noch "+round1(t.kern-st.cat.kern)+" ECTS"):" · erreicht"}</div>`
+      + `<div class="kern-sub hidden" id="kernSub"><div>${catRowHtml("Engineering",st.ber.engineering,t.eng)}</div><div>${catRowHtml("Wirtschaft",st.ber.wirtschaft,t.wirt)}</div><div>${catRowHtml("Design",st.ber.design,t.design)}</div></div>`
+      + '</div>';
+    h += `<div class="cat-row">${catRowHtml("Projektmodule", st.cat.projekt, t.projekt)}</div>`;
+    h += `<div class="cat-row">${catRowHtml("Wahlbereich (Erweiterung/Zusatz)", st.cat.wahl, t.wahl)}</div>`;
+    if(st.cat.sonstige>0){
+      h += `<div class="cat-row"><div class="p-req-top"><div class="p-req-title">Sonstige (ohne Kategorie)</div><div class="p-req-pct">${round1(st.cat.sonstige)} ECTS</div></div><div class="p-req-detail">Keinem Ziel zugeordnet – im Modul einen Katalog-Eintrag wählen oder Kategorie ergänzen.</div></div>`;
+    }
+    return h;
+  }
+
+  function renderStats(){
+    const host=$("statsView"); if(!host) return;
+    const st=computeStats();
+    const total=st.t.total||180;
+    const pct = total>0 ? Math.min(1, st.passedTotal/total) : 0;
+    const pctTxt=Math.round(pct*100);
+    const remain=Math.max(0, total-st.passedTotal);
+    const avgSems=st.perSem.filter(s=>s.avg!=null);
+    let trend="";
+    if(avgSems.length>=2){ const d=avgSems[avgSems.length-1].avg-avgSems[0].avg; trend = Math.abs(d)<0.1?"stabil →":(d>0?"steigend ↗":"fallend ↘"); }
+    let bw="";
+    if(avgSems.length){
+      let bS=avgSems[0], wS=avgSems[0];
+      avgSems.forEach(s=>{ if(s.avg>bS.avg)bS=s; if(s.avg<wS.avg)wS=s; });
+      bw = (bS===wS)
+        ? `<div class="sub" style="margin:10px 0 0;">Semester: ${esc(bS.name)} (${fmtAvg(bS.avg)})</div>`
+        : `<div class="sub" style="margin:10px 0 0;">Bestes: ${esc(bS.name)} (${fmtAvg(bS.avg)}) · Schwächstes: ${esc(wS.name)} (${fmtAvg(wS.avg)})</div>`;
+    }
+    host.innerHTML =
+      `<div class="stat-card"><h3>Gesamtfortschritt</h3><div class="sub">Bestandene ECTS von ${total}</div>`
+      + `<div class="stat-hero"><div class="stat-ring">${svgRing(pct)}<div class="stat-ring-num">${pctTxt}%</div></div>`
+      + `<div><div class="stat-big">${round1(st.passedTotal)} <span>/ ${total}</span></div>`
+      + `<div class="sub" style="margin:6px 0 0;">${remain>0?("Noch "+round1(remain)+" ECTS bis zum Abschluss"):"Ziel erreicht 🎉"}</div></div></div></div>`
+      + `<div class="stat-card"><h3>Kredit-Verlauf</h3><div class="sub">Kumulierte bestandene ECTS je Semester · Balken = pro Semester, Linie läuft auf ${total} zu</div>${svgCumulative(st.perSem, total)}</div>`
+      + `<div class="stat-card"><h3>Notenschnitt je Semester</h3><div class="sub">ECTS-gewichteter Schnitt${trend?(" · Trend: "+trend):""}</div>${svgAverages(st.perSem)}${bw}</div>`
+      + `<div class="stat-card"><h3>Fortschritt je Studieninhalt</h3><div class="sub">Mindestwerte laut Studienplan – Minima summieren auf 168, ~12 ECTS frei bis 180. Werte in den Einstellungen änderbar.</div>${catBlock(st)}</div>`;
+    const kt=host.querySelector("#kernToggle");
+    if(kt) kt.addEventListener("click", ()=>{
+      const b=host.querySelector("#kernSub");
+      if(b){ const open=b.classList.toggle("hidden"); kt.setAttribute("aria-expanded", open?"false":"true"); }
+    });
+  }
+  function renderStatsIfOpen(){ const o=$("ovStats"); if(o && o.classList.contains("open")) renderStats(); }
+  $("btnStats").addEventListener("click", ()=>{ renderStats(); openOverlay("ovStats"); });
+  $("btnCloseStats").addEventListener("click", ()=>closeOverlay("ovStats"));
+
+  /* Editierbare Studienziele */
+  const TGT=[["tgtTotal","total"],["tgtKern","kern"],["tgtEng","eng"],["tgtWirt","wirt"],["tgtDesign","design"],["tgtProjekt","projekt"],["tgtWahl","wahl"]];
+  function refreshTargets(){ TGT.forEach(([id,k])=>{ const el=$(id); if(el) el.value = data.settings.targets[k]; }); }
+  TGT.forEach(([id,k])=>{ const el=$(id); if(el) el.addEventListener("change", ()=>{ let v=parseInt(el.value,10); if(isNaN(v)||v<0) v=0; data.settings.targets[k]=v; save(); renderStatsIfOpen(); }); });
 
   buildLetterRow();
   buildQuickGrades();
