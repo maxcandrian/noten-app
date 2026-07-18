@@ -580,7 +580,16 @@
     <div class="details-body hidden hide-in-note" id="detailsBody">
       <label class="field sel"><span>Semester</span><select id="inSem"></select></label>
       <label class="field"><span>Modulcode</span><input id="inCode" type="text" placeholder="z.B. LINALG" autocomplete="off" autocapitalize="characters" spellcheck="false" /></label>
-      <label class="field sel"><span>Bereich</span>
+      <label class="field sel"><span>Kategorie (Studieninhalt)</span>
+        <select id="inKat">
+          <option value="">– automatisch / keine –</option>
+          <option value="kern">Kernmodul</option>
+          <option value="projekt">Projektmodul</option>
+          <option value="erweiterung">Erweiterung</option>
+          <option value="zusatz">Zusatz</option>
+        </select>
+      </label>
+      <label class="field sel"><span>Bereich (für Zertifikate)</span>
         <select id="inArea">
           <option value="">– kein –</option>
           <option value="core_related">Core / Related</option>
@@ -665,7 +674,8 @@
         <label>· Wirtschaft<input type="number" id="tgtWirt" inputmode="numeric" min="0" step="1" /></label>
         <label>· Design<input type="number" id="tgtDesign" inputmode="numeric" min="0" step="1" /></label>
         <label>Projektmodule<input type="number" id="tgtProjekt" inputmode="numeric" min="0" step="1" /></label>
-        <label>Wahlbereich<input type="number" id="tgtWahl" inputmode="numeric" min="0" step="1" /></label>
+        <label>Erweiterung<input type="number" id="tgtErweiterung" inputmode="numeric" min="0" step="1" /></label>
+        <label>Zusatz<input type="number" id="tgtZusatz" inputmode="numeric" min="0" step="1" /></label>
       </div>
     </div>
     <div class="toggle-row" style="display:block;">
@@ -721,7 +731,7 @@
   const KEY = "hslu_noten_v1";
   const PASS = 4.0;
   // Offizielle Mindestwerte WI|Innovation (nicht amtlich, editierbar via settings.targets).
-  const DEFAULT_TARGETS = { total:180, kern:93, eng:54, wirt:30, design:9, projekt:45, wahl:30 };
+  const DEFAULT_TARGETS = { total:180, kern:93, eng:54, wirt:30, design:9, projekt:45, erweiterung:15, zusatz:15 };
 
   function numToLetter(g){
     if(g==null||isNaN(g)) return "–";
@@ -1001,14 +1011,14 @@
       const m = sem.modules.find(x=>x.id===modId);
       $("gradeTitle").textContent = noteOnlyMode ? (m.name||"Note") : "Modul bearbeiten";
       $("inName").value=m.name||""; $("inEcts").value=m.ects??""; $("inGrade").value=(m.grade==null?"":m.grade);
-      $("inCode").value=m.code||""; $("inArea").value=m.area||"";
+      $("inCode").value=m.code||""; $("inArea").value=m.area||""; $("inKat").value=katSimple(m.kategorie);
       $("inEnglish").checked=m.english===true; $("inAbroad").checked=m.abroad===true;
       setTags(Array.isArray(m.tags)?m.tags:[]);
       $("btnDeleteGrade").classList.remove("hidden");
     } else {
       $("gradeTitle").textContent="Modul hinzufügen";
       $("inName").value=""; $("inEcts").value=""; $("inGrade").value="";
-      $("inCode").value=""; $("inArea").value="";
+      $("inCode").value=""; $("inArea").value=""; $("inKat").value="";
       $("inEnglish").checked=false; $("inAbroad").checked=false;
       setTags([]);
       $("btnDeleteGrade").classList.add("hidden");
@@ -1056,6 +1066,10 @@
       el.addEventListener("mousedown", e=>{ e.preventDefault(); selectModule(taItems[+el.dataset.i]); });
     });
   }
+  function codeExists(code, exceptId){
+    code=(code||"").toString().toLowerCase().trim(); if(!code) return false;
+    return data.semesters.some(s=> s.modules.some(m=> m.id!==exceptId && (m.code||"").toString().toLowerCase().trim()===code));
+  }
   function selectModule(m){
     if(!m) return;
     chosenModule = m;
@@ -1064,12 +1078,14 @@
     $("inCode").value = m.code || "";
     $("inEcts").value = (m.ects!=null ? m.ects : "");
     $("inArea").value = KAT_TO_AREA[m.kategorie] || "";
+    $("inKat").value = katSimple(m.kategorie);
     $("inEnglish").checked = (m.sprache === "E");
     const kat = CAT_KAT[m.kategorie] || m.kategorie || "";
     let chips = `<span class="tag">${m.ects} ECTS</span><span class="tag">${esc(kat)}</span>`;
     if(m.sprache==="E") chips += '<span class="tag">Englisch</span>';
     if(m.vertiefung && CAT_VERT[m.vertiefung]) chips += `<span class="tag">${esc(CAT_VERT[m.vertiefung])}</span>`;
     if(m.ects_gesichert===false) chips += '<span class="tag warn">ECTS prüfen</span>';
+    if(codeExists(m.code, editing && editing.modId)) chips += '<span class="tag warn">bereits erfasst</span>';
     chips += '<button type="button" id="modClear">ändern</button>';
     const info = $("modInfo"); info.innerHTML = chips; info.classList.remove("hidden");
     const clr = info.querySelector("#modClear");
@@ -1162,6 +1178,7 @@
 
     const code = $("inCode").value.trim();
     const area = $("inArea").value || null;
+    const kat = $("inKat").value || null;
     const english = $("inEnglish").checked;
     const abroad = $("inAbroad").checked;
     const tags = getTags();
@@ -1169,7 +1186,9 @@
     function apply(m){
       m.name=name; m.ects=ects; m.grade=grade;
       m.code=code; m.area=area; m.english=english; m.abroad=abroad; m.tags=tags;
-      if(chosenModule){ m.kategorie=chosenModule.kategorie; m.bereich=chosenModule.bereich; m.vertiefung=chosenModule.vertiefung; }
+      // Kategorie: Dropdown ist massgeblich; sonst aus Katalogauswahl übernehmen.
+      m.kategorie = kat || (chosenModule ? katSimple(chosenModule.kategorie) : null);
+      if(chosenModule){ m.bereich=chosenModule.bereich; m.vertiefung=chosenModule.vertiefung; }
     }
 
     const sem = data.semesters.find(s=>s.id===semId);
@@ -1630,17 +1649,20 @@
   /* ── Statistik-Ansicht (alle Diagramme reines inline-SVG, offline) ──
      Rein additiv/lesend: nutzt bestehende Berechnungen (semStats, PASS)
      und settings.targets. Ändert nichts am Datenmodell oder Notenschnitt. */
-  function catOf(m){
-    const k=(m.kategorie||"").toLowerCase();
-    if(k==="pflicht"||k==="kernwahl") return "kern";
+  // Katalog- ODER manuelle Kategorie -> vereinfachter Studieninhalt.
+  function katSimple(k){
+    k=(k||"").toString().toLowerCase();
+    if(k==="pflicht"||k==="kernwahl"||k==="kern") return "kern";
     if(k==="projekt") return "projekt";
-    if(k==="erweiterung") return "wahl";
-    return "sonstige";
+    if(k==="erweiterung") return "erweiterung";
+    if(k==="zusatz") return "zusatz";
+    return "";
   }
+  function catOf(m){ return katSimple(m.kategorie) || "sonstige"; }
   function computeStats(){
     const t = data.settings.targets || DEFAULT_TARGETS;
     let passedTotal=0;
-    const cat={kern:0, projekt:0, wahl:0, sonstige:0};
+    const cat={kern:0, projekt:0, erweiterung:0, zusatz:0, sonstige:0};
     const ber={engineering:0, wirtschaft:0, design:0};
     const perSem = data.semesters.map(s=>{
       let semPassed=0;
@@ -1725,10 +1747,11 @@
       + `<div class="p-req-top"><div class="p-req-title">Kernmodule <button type="button" id="kernToggle" class="mini-toggle" aria-expanded="false">Bereiche</button></div><div class="p-req-pct">${round1(st.cat.kern)} / ${t.kern}</div></div>`
       + `<div class="p-req-bar"><i style="width:${Math.round(Math.min(1,t.kern>0?st.cat.kern/t.kern:0)*100)}%; background:${st.cat.kern>=t.kern?'var(--good)':'var(--accent)'}"></i></div>`
       + `<div class="p-req-detail">${Math.round((t.kern>0?Math.min(1,st.cat.kern/t.kern):0)*100)}%${Math.max(0,t.kern-st.cat.kern)>0?(" · noch "+round1(t.kern-st.cat.kern)+" ECTS"):" · erreicht"}</div>`
-      + `<div class="kern-sub hidden" id="kernSub"><div>${catRowHtml("Engineering",st.ber.engineering,t.eng)}</div><div>${catRowHtml("Wirtschaft",st.ber.wirtschaft,t.wirt)}</div><div>${catRowHtml("Design",st.ber.design,t.design)}</div></div>`
+      + `<div class="kern-sub hidden" id="kernSub"><div>${catRowHtml("Engineering",st.ber.engineering,t.eng)}</div><div>${catRowHtml("Wirtschaft",st.ber.wirtschaft,t.wirt)}</div><div>${catRowHtml("Design",st.ber.design,t.design)}</div><div class="note" style="margin-top:2px;">Hinweis: Der eingebettete Engineering-Katalog listet aktuell ~3 ECTS unter den offiziellen 54 – ggf. ein Modul manuell ergänzen.</div></div>`
       + '</div>';
     h += `<div class="cat-row">${catRowHtml("Projektmodule", st.cat.projekt, t.projekt)}</div>`;
-    h += `<div class="cat-row">${catRowHtml("Wahlbereich (Erweiterung/Zusatz)", st.cat.wahl, t.wahl)}</div>`;
+    h += `<div class="cat-row">${catRowHtml("Erweiterung", st.cat.erweiterung, t.erweiterung)}</div>`;
+    h += `<div class="cat-row">${catRowHtml("Zusatz", st.cat.zusatz, t.zusatz)}</div>`;
     if(st.cat.sonstige>0){
       h += `<div class="cat-row"><div class="p-req-top"><div class="p-req-title">Sonstige (ohne Kategorie)</div><div class="p-req-pct">${round1(st.cat.sonstige)} ECTS</div></div><div class="p-req-detail">Keinem Ziel zugeordnet – im Modul einen Katalog-Eintrag wählen oder Kategorie ergänzen.</div></div>`;
     }
@@ -1772,7 +1795,7 @@
   $("btnCloseStats").addEventListener("click", ()=>closeOverlay("ovStats"));
 
   /* Editierbare Studienziele */
-  const TGT=[["tgtTotal","total"],["tgtKern","kern"],["tgtEng","eng"],["tgtWirt","wirt"],["tgtDesign","design"],["tgtProjekt","projekt"],["tgtWahl","wahl"]];
+  const TGT=[["tgtTotal","total"],["tgtKern","kern"],["tgtEng","eng"],["tgtWirt","wirt"],["tgtDesign","design"],["tgtProjekt","projekt"],["tgtErweiterung","erweiterung"],["tgtZusatz","zusatz"]];
   function refreshTargets(){ TGT.forEach(([id,k])=>{ const el=$(id); if(el) el.value = data.settings.targets[k]; }); }
   TGT.forEach(([id,k])=>{ const el=$(id); if(el) el.addEventListener("change", ()=>{ let v=parseInt(el.value,10); if(isNaN(v)||v<0) v=0; data.settings.targets[k]=v; save(); renderStatsIfOpen(); }); });
 
